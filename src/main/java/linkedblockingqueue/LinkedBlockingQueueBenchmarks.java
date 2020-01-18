@@ -1,7 +1,6 @@
 package linkedblockingqueue;
 
 
-import arrayblockingqueue.ArrayBlockingQueueBenchmarks;
 import config.Configuration;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -16,6 +15,10 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Thread)
 public class LinkedBlockingQueueBenchmarks {
+
+
+    @Param({"8192", "32768", "65536"})
+    private int queueSize;
 
     private ExecutorService executor;
     private LinkedBlockingQueue<Long> queue;
@@ -46,7 +49,7 @@ public class LinkedBlockingQueueBenchmarks {
     @Setup
     public void setup() {
         executor = Executors.newFixedThreadPool(Configuration.THREADS);
-        queue = new LinkedBlockingQueue<>();
+        queue = new LinkedBlockingQueue<Long>();
     }
 
     @TearDown
@@ -73,8 +76,8 @@ public class LinkedBlockingQueueBenchmarks {
                     ;
                 }
             }
-        } catch (final InterruptedException ex) {
-            throw new RuntimeException("Test failed due to interrupt.", ex);
+        } catch (final InterruptedException e) {
+            throw new RuntimeException("Test failed due to interrupt.", e);
         }
     }
 

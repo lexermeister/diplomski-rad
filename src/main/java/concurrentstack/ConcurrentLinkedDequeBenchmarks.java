@@ -47,7 +47,6 @@ public class ConcurrentLinkedDequeBenchmarks {
 
     public static void runBenchmark(int numOfThreads) throws Exception {
         final String resultFileName = "ConcurrentLinkedDeque_threads_x" + numOfThreads + ".csv";
-//        final String resultFileName = "ConcurrentLinkedDeque_results.csv";
 
         Options opts = new OptionsBuilder()
                 .include(".*" + ConcurrentLinkedDequeBenchmarks.class.getSimpleName() + ".*")

@@ -14,8 +14,8 @@ public class RunBenchmarks {
 
         for(int numOfThreads : threadConfigurations) {
             DisruptorBenchmarks.runBenchmarks(numOfThreads);
-            LinkedBlockingQueueBenchmarks.runBenchmarks(numOfThreads);
-            ArrayBlockingQueueBenchmarks.runBenchmarks(numOfThreads);
+           LinkedBlockingQueueBenchmarks.runBenchmarks(numOfThreads);
+               ArrayBlockingQueueBenchmarks.runBenchmarks(numOfThreads);
             ConcurrentLinkedQueueBenchmark.runBenchmarks(numOfThreads);
             ConcurrentLinkedDequeBenchmarks.runBenchmark(numOfThreads);
         }

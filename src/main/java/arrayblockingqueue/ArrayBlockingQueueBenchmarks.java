@@ -14,7 +14,7 @@ public class ArrayBlockingQueueBenchmarks {
 
     private ExecutorService executor;
     private BlockingQueue<Long> queue;
-    @Param({"1024"})
+    @Param({"8192", "32768", "65536"})
     private int queueSize;
 
     private final Runnable addTask = () -> {
@@ -39,7 +39,7 @@ public class ArrayBlockingQueueBenchmarks {
 
     @Setup
     public void setup() {
-        executor = Executors.newFixedThreadPool(1);
+        executor = Executors.newFixedThreadPool(Configuration.THREADS);
         queue = new ArrayBlockingQueue<Long>(queueSize);
 
     }
@@ -50,6 +50,21 @@ public class ArrayBlockingQueueBenchmarks {
         for(int i = 0; i < Configuration.ONE_MLN; i++) {
             while (queue.poll() != Configuration.VALUE){ ;
             }
+        }
+    }
+
+    @Benchmark
+    public void sendOneMlnWaiting() throws Exception{
+        executor.execute(addWaitingTask);
+
+        try{
+
+            for(int i = 0; i < Configuration.ONE_MLN; i++) {
+                while (queue.poll(1L, TimeUnit.MICROSECONDS) != Configuration.VALUE){ ;
+                }
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Test failed due to interrupt.", e);
         }
     }
 

@@ -10,6 +10,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @State(Scope.Thread)
 public class ConcurrentLinkedQueueBenchmark {
@@ -17,7 +18,6 @@ public class ConcurrentLinkedQueueBenchmark {
     private ExecutorService executor;
     private ConcurrentLinkedQueue<Long> queue;
 
-    @Param({"1024", "2048"})
     private int queueSize;
 
     private final Runnable addTask = () -> {
@@ -53,7 +53,6 @@ public class ConcurrentLinkedQueueBenchmark {
 
     public static void runBenchmarks(int numOfThreads) throws Exception {
         final String resultFileName = "ConcurrentLinkedQueue_threads_x" + numOfThreads + ".csv";
-//        final String resultFileName = "ConcurrentLinkedQueue_results.csv";
 
         Options opts = new OptionsBuilder()
                 .include(".*" + ConcurrentLinkedQueueBenchmark.class.getSimpleName() + ".*")
