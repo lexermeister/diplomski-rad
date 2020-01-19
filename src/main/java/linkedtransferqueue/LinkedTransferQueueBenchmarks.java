@@ -1,4 +1,4 @@
-package concurrentstack;
+package linkedtransferqueue;
 
 import config.Configuration;
 import org.openjdk.jmh.annotations.*;
@@ -10,46 +10,69 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.concurrent.*;
 
 @State(Scope.Thread)
-public class ConcurrentLinkedDequeBenchmarks {
+public class LinkedTransferQueueBenchmarks {
 
     private ExecutorService executor;
-    private ConcurrentLinkedDeque<Long> deque;
+    private TransferQueue<Long> queue;
 
     private final Runnable addTask = () -> {
+
         for(int i = 0; i < Configuration.ONE_MLN; i++) {
-            while(!deque.offer(Configuration.VALUE)) {
-                ;
+            if(queue.hasWaitingConsumer()) {
+                queue.tryTransfer(Configuration.VALUE);
+            } else {
+                while(!queue.offer(Configuration.VALUE)){ ;
+                }
             }
+
         }
+
+    };
+
+    private final Runnable addWaitingTask = () -> {
+        try {
+            for (int i = 0; i < Configuration.ONE_MLN; i++) {
+                if(queue.hasWaitingConsumer()) {
+                    queue.tryTransfer(Configuration.VALUE, 1L, TimeUnit.MICROSECONDS);
+                } else {
+                    while (!queue.offer(Configuration.VALUE, 1L, TimeUnit.MICROSECONDS)) {
+                        ;
+                    }
+                }
+            }
+        }catch (InterruptedException e) {
+            throw new RuntimeException("Test failed due to interrupt.", e);
+        }
+
     };
 
     @Setup
     public void setup() {
         executor = Executors.newFixedThreadPool(Configuration.THREADS);
-        deque = new ConcurrentLinkedDeque<>();
+        queue = new LinkedTransferQueue<Long>();
+
     }
+
+    @Benchmark
+    public void sendOneMln() {
+        executor.execute(addTask);
+        for(int i = 0; i < Configuration.ONE_MLN; i++) {
+            while (queue.poll() != Configuration.VALUE){ ;
+            }
+        }
+    }
+
 
     @TearDown
     public void tearDown() {
         executor.shutdown();
     }
 
-    @Benchmark
-    public void sendOneMln() {
-        executor.execute(addTask);
-
-        for(int i = 0; i < Configuration.ONE_MLN; i++) {
-            while(deque.poll() != Configuration.VALUE){
-                ;
-            }
-        }
-    }
-
-    public static void runBenchmark(int numOfThreads) throws Exception {
-        final String resultFileName = "ConcurrentLinkedDeque_threads_x" + numOfThreads + ".csv";
+    public static void runBenchmarks(int numOfThreads) throws Exception {
+        final String resultFileName = "LinkedTransferQueue_threads_x" + numOfThreads + ".csv";
 
         Options opts = new OptionsBuilder()
-                .include(".*" + ConcurrentLinkedDequeBenchmarks.class.getSimpleName() + ".*")
+                .include(".*" +LinkedTransferQueueBenchmarks.class.getSimpleName() + ".*")
                 .forks(Configuration.FORKS)
                 .threads(numOfThreads)
                 .jvmArgs("-server", "-Xms2048m", "-Xmx2048m")
@@ -63,5 +86,6 @@ public class ConcurrentLinkedDequeBenchmarks {
 
         new Runner(opts).run();
     }
+
 
 }

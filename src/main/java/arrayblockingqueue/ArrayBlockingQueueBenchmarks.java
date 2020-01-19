@@ -28,7 +28,7 @@ public class ArrayBlockingQueueBenchmarks {
     private final Runnable addWaitingTask = () -> {
         try {
             for (int i = 0; i < Configuration.ONE_MLN; i++) {
-                while(!queue.offer(Configuration.VALUE, 1L, TimeUnit.SECONDS)){
+                while(!queue.offer(Configuration.VALUE, 1L, TimeUnit.MICROSECONDS)){
                     ;
                 }
             }

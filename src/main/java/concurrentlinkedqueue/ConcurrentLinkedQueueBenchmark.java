@@ -30,7 +30,7 @@ public class ConcurrentLinkedQueueBenchmark {
 
     @Setup
     public void setup() {
-        executor = Executors.newFixedThreadPool(1);
+        executor = Executors.newFixedThreadPool(Configuration.THREADS);
         queue = new ConcurrentLinkedQueue<Long>();
     }
 
